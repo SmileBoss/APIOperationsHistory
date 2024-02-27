@@ -1,8 +1,11 @@
 package ru.netology.nshirmanov;
 
+import ru.netology.nshirmanov.utils.DateUtils;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) {
@@ -44,16 +47,37 @@ public class Main {
             transactionCount++;
         }
 
+        IntStream.range(0, transactionCount).forEach(i -> {
+            System.out.println("Транзакция #" + (i + 1) + ":");
+            print(dates[i], transactionIDs[i], amounts[i], descriptions[i], transactionTypes[i]);
+        });
+
+        System.out.println("Введите начальную дату диапазона (гггг-мм-дд):");
+        LocalDate startDate = LocalDate.parse(scanner.nextLine());
+        System.out.println("Введите конечную дату диапазона (гггг-мм-дд):");
+        LocalDate endDate = LocalDate.parse(scanner.nextLine());
+
         scanner.close();
 
-        for (int i = 0; i < 5; i++) {
-            System.out.println("Транзакция #" + (i + 1) + ":");
-            System.out.println("ID транзакции: " + transactionIDs[i] +
-                    ", Описание: " + descriptions[i] +
-                    ", Сумма: " + amounts[i] +
-                    ", Дата: " + dates[i] +
-                    ", Тип транзакции: " + transactionTypes[i]);
-        }
+        findTransactionsByDateRange(dates, transactionIDs, amounts, descriptions, transactionTypes, startDate, endDate);
+    }
 
+    public static void print(LocalDate date, Long transactionID,
+                             Double amount, String description,
+                             String transactionType) {
+        System.out.println("ID транзакции: " + transactionID +
+                ", Описание: " + description +
+                ", Сумма: " + amount +
+                ", Дата: " + date +
+                ", Тип транзакции: " + transactionType);
+    }
+
+    public static void findTransactionsByDateRange(LocalDate[] dates, Long[] transactionIDs,
+                                                   Double[] amounts, String[] descriptions,
+                                                   String[] transactionTypes, LocalDate startDate,
+                                                   LocalDate endDate) {
+        IntStream.range(0, dates.length).filter(i -> DateUtils.localDateIsAfterOrEqual(dates[i], startDate) &&
+                DateUtils.localDateIsBeforeOrEqual(dates[i], endDate)).forEachOrdered(i ->
+                print(dates[i], transactionIDs[i], amounts[i], descriptions[i], transactionTypes[i]));
     }
 }
