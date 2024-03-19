@@ -12,6 +12,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import static ru.netology.nshirmanov.OperationDataIO.deserializeData;
+import static ru.netology.nshirmanov.OperationDataIO.serializeData;
+
 public class Main {
 
     public static List<Operation> operations = new ArrayList<>();
@@ -28,14 +31,26 @@ public class Main {
             System.out.println("1. Добавить клиента");
             System.out.println("2. Добавить операцию");
             System.out.println("3. Вывести операции клиента");
-            System.out.println("4. Выйти");
+            System.out.println("4. Сериализация данных");
+            System.out.println("5. Десериализация данных");
+            System.out.println("6. Выйти");
 
             int choice = scanner.nextInt();
             switch (choice) {
                 case 1 -> createCustomer(scanner);
                 case 2 -> createOperation(scanner);
                 case 3 -> getCustomerOperations(scanner).forEach(Operation::print);
-                case 4 -> System.exit(0);
+                case 4 -> serializeData(new OperationData(operations, customers, statement));
+                case 5 -> {
+                    scanner.nextLine();
+                    System.out.println("Введите путь до файла:");
+                    String path = scanner.nextLine();
+                    OperationData operationData = deserializeData(path);
+                    customers = operationData.getCustomers();
+                    operations = operationData.getOperations();
+                    statement = operationData.getStatements();
+                }
+                case 6 -> System.exit(0);
                 default -> System.out.println("Некорректный выбор. Попробуйте снова.");
             }
         }
