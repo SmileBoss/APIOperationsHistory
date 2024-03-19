@@ -1,9 +1,12 @@
 package ru.netology.nshirmanov;
 
+import ru.netology.nshirmanov.exceptions.CustomerOperationOutOfBoundException;
+import ru.netology.nshirmanov.exceptions.OperationRuntimeException;
 import ru.netology.nshirmanov.utils.DateUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +41,19 @@ public class Main {
         }
     }
 
+    public static void saveOperationToStatement(int customerId, int operationId) {
+        if (customerId < 0 || customerId >= statement.size()) {
+            throw new CustomerOperationOutOfBoundException(customerId, operationId);
+        }
+        ArrayList<Integer> operationStatement = statement.get(customerId);
+        if (operationStatement == null) {
+            operationStatement = new ArrayList<>();
+        }
+        operationStatement.add(operationId);
+        statement.set(customerId, operationStatement);
+    }
+
+
     public static void createCustomer(Scanner scanner) {
         System.out.println("Введите имя клиента:");
         String name = scanner.nextLine();
@@ -71,7 +87,12 @@ public class Main {
         String description = scanner.nextLine();
         System.out.println("Введите дату транзакции (гггг-мм-дд):");
         String dateString = scanner.nextLine();
-        LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        } catch (DateTimeParseException e) {
+            throw new OperationRuntimeException("Некорретный формат даты {0}", dateString);
+        }
         switch (operationType) {
             case 1 -> operations.add(new Operation(operations.size(), amount, description, date));
             case 2 -> {
@@ -84,9 +105,9 @@ public class Main {
                 int loanId = scanner.nextInt();
                 operations.add(new LoanOperation(operations.size(), amount, description, date, loanId));
             }
-            default -> throw new IllegalStateException("Неожиданное значение: " + operationType);
+            default -> throw new OperationRuntimeException("Неожиданное значение: {0}", operationType);
         }
-        statement.get(customerId).add(operations.size() - 1);
+        saveOperationToStatement(customerId, operations.size() - 1);
         System.out.println("Операция успешно добавлена клиенту с ID: " + customerId);
     }
 
@@ -106,13 +127,18 @@ public class Main {
             System.out.println("Выбрать транзакции за диапазон дат? (да)");
             scanner.nextLine();
             if ("да".equals(scanner.nextLine())) {
-                System.out.println("Введите начальную дату диапазона (гггг-мм-дд):");
-                LocalDate startDate = LocalDate.parse(scanner.nextLine());
-                System.out.println("Введите конечную дату диапазона (гггг-мм-дд):");
-                LocalDate endDate = LocalDate.parse(scanner.nextLine());
-                return findTransactionsByDateRange(operations.stream()
-                        .filter(operation -> customerOperations.contains(operation.getId()))
-                        .toList(), startDate, endDate);
+                try {
+                    System.out.println("Введите начальную дату диапазона (гггг-мм-дд):");
+                    LocalDate startDate = LocalDate.parse(scanner.nextLine());
+                    System.out.println("Введите конечную дату диапазона (гггг-мм-дд):");
+                    LocalDate endDate = LocalDate.parse(scanner.nextLine());
+                    return findTransactionsByDateRange(operations.stream()
+                            .filter(operation -> customerOperations.contains(operation.getId()))
+                            .toList(), startDate, endDate);
+                } catch (DateTimeParseException e) {
+                    throw new OperationRuntimeException("Некорретный формат даты");
+                }
+
             } else {
                 return operations.stream()
                         .filter(operation -> customerOperations.contains(operation.getId()))
