@@ -16,6 +16,7 @@ public class Operation implements ConsolePrintable, Serializable {
 
     private int id;
     private double amount;
+    private int customerId;
     private String description;
     private LocalDate date;
 

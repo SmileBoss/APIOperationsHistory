@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class LoanOperation extends Operation {
     private int loanId;
 
-    public LoanOperation(int id, double amount, String description, LocalDate date, int loanId) {
-        super(id, amount, description, date);
+    public LoanOperation(int id, double amount, int customerId, String description, LocalDate date, int loanId) {
+        super(id, amount, customerId, description, date);
         this.loanId = loanId;
     }
 
