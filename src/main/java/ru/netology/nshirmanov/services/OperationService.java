@@ -43,6 +43,10 @@ public class OperationService {
         return operation;
     }
 
+    public void addOperation(Operation operation) {
+        operationStorage.addItem(operation);
+    }
+
     public List<Operation> getOperationsByCustomer(int customerId) {
         return operationStorage.getAllItems().stream()
                 .filter(operation -> operation.getCustomerId() == customerId)
