@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class CashbackOperation extends Operation {
     private int cashbackAmount;
 
-    public CashbackOperation(int id, double amount, String description, LocalDate date, int cashbackAmount) {
-        super(id, amount, description, date);
+    public CashbackOperation(int id, double amount, int customerId, String description, LocalDate date, int cashbackAmount) {
+        super(id, amount, customerId, description, date);
         this.cashbackAmount = cashbackAmount;
     }
 
