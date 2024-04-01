@@ -1,9 +1,13 @@
 package ru.netology.nshirmanov.services;
 
+import org.springframework.stereotype.Component;
+import ru.netology.nshirmanov.exceptions.OperationRuntimeException;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class StorageService<T> implements Serializable {
 
     private final List<T> storage = new ArrayList<>();
@@ -14,6 +18,14 @@ public class StorageService<T> implements Serializable {
 
     public T getItem(int index) {
         return storage.get(index);
+    }
+
+    public void updateItem(int index, T newItem) {
+        try {
+            storage.set(index, newItem);
+        } catch (IndexOutOfBoundsException e) {
+            throw new OperationRuntimeException("Index: {0}, Size: {1}", e, index, storage.size());
+        }
     }
 
     public List<T> getAllItems() {
@@ -28,6 +40,10 @@ public class StorageService<T> implements Serializable {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(path))) {
             oos.writeObject(storage);
         }
+    }
+
+    public void removeItem(int index) {
+        storage.remove(index);
     }
 
     @SuppressWarnings("unchecked")

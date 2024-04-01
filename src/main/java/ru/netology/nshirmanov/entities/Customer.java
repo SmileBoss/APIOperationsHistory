@@ -1,4 +1,4 @@
-package ru.netology.nshirmanov;
+package ru.netology.nshirmanov.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
